@@ -1,13 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Upload, GitCompare, History, FileText, Scale } from 'lucide-react';
+import { Upload, GitCompare, History, FileText, Scale, Download } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: FileText },
   { href: '/upload', label: 'Upload', icon: Upload },
   { href: '/compare', label: 'Compare', icon: GitCompare },
+  { href: '/export', label: 'Export', icon: Download },
   { href: '/history', label: 'History', icon: History },
 ];
 
