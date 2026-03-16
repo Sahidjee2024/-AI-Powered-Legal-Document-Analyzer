@@ -15,6 +15,10 @@ async def extract_clauses(doc_id: str, db: Session) -> ClauseExtractionResult:
         raise HTTPException(404, "Document not found")
 
     chunks = await query_chunks("contract clauses obligations terms", [doc_id], top_k=15)
+    
+    if not chunks:
+        raise HTTPException(400, "No document chunks found. The document may not have been processed correctly.")
+    
     full_text = "\n\n".join([c["text"] for c in chunks])
 
     prompt = f"Extract all clauses from this legal document:\n\n{full_text[:6000]}"
@@ -38,6 +42,10 @@ async def flag_risks(doc_id: str, db: Session) -> RiskAnalysisResult:
         raise HTTPException(404, "Document not found")
 
     chunks = await query_chunks("risk liability penalty termination indemnification", [doc_id], top_k=15)
+    
+    if not chunks:
+        raise HTTPException(400, "No document chunks found. The document may not have been processed correctly.")
+    
     full_text = "\n\n".join([c["text"] for c in chunks])
 
     prompt = f"Identify all risks in this legal document:\n\n{full_text[:6000]}"
@@ -63,6 +71,10 @@ async def generate_summary(doc_id: str, db: Session) -> dict:
         raise HTTPException(404, "Document not found")
 
     chunks = await query_chunks("parties obligations dates payment terms summary", [doc_id], top_k=15)
+    
+    if not chunks:
+        raise HTTPException(400, "No document chunks found. The document may not have been processed correctly.")
+    
     full_text = "\n\n".join([c["text"] for c in chunks])
 
     prompt = f"Summarize this legal document:\n\n{full_text[:6000]}"

@@ -14,7 +14,8 @@ async def call_llm(prompt: str, system: str = "") -> str:
     if system:
         payload["system"] = system
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    # Increased timeout to 300 seconds for longer documents
+    async with httpx.AsyncClient(timeout=300.0) as client:
         try:
             response = await client.post(
                 f"{settings.ollama_base_url}/api/generate",
@@ -40,6 +41,15 @@ async def call_llm_structured(prompt: str, system: str, output_model: type[BaseM
                     clean = clean[4:]
             clean = clean.strip()
             parsed = json.loads(clean)
+            
+            # Handle case where LLM returns array instead of object
+            # If output_model expects a wrapper with 'clauses' or 'risks' field
+            if isinstance(parsed, list):
+                if output_model.model_fields.get('clauses'):
+                    parsed = {"clauses": parsed}
+                elif output_model.model_fields.get('risks'):
+                    parsed = {"risks": parsed}
+            
             return output_model.model_validate(parsed)
         except Exception as e:
             if attempt == 1:
